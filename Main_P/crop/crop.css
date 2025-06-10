@@ -1,0 +1,86 @@
+:root {
+    --bg-color: #222327;
+    --text-color: #ffffff;
+    --main-color: #2db749;
+
+}
+
+.logo i {
+    color: var(--main-color);
+    font-size: 28px;
+    margin-right: 3px;
+    align-items: center;
+    width: 100%;
+    height: 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+
+}
+
+a {
+    text-decoration: none;
+    color: var(--text-color);
+    font-size: 1.2rem;
+}
+
+a:hover {
+    color: var(--main-color);
+}
+
+.logo a {
+    font-size: 1.75rem;
+    font-weight: bold;
+}
+
+header {
+    position: relative;
+    padding:  2rem;
+}
+
+body{
+    height: 100vh;
+    background-color: var(--bg-color);
+    background-image: linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)),url(../pic/second.jpg);
+    
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+fieldset{
+    text-align: center;
+    width: 800px;
+}
+
+.btn {
+    border: none;
+    outline: 0;
+    display: inline-block;
+    padding: 8px;
+    color: white;
+    background-color: #000;
+    text-align: center;
+    cursor: pointer;
+    font-size: 1.1rem;
+    width: 50%;
+}
+
+.btn:hover {
+    background-color:var(--main-color);
+}
+
+legend{
+    color:var(--text-color)
+}
+
+label{
+    color: var(--text-color);
+    font-size: 1.2rem;
+    padding: 5px;
+}
+.print{
+    color: var(--text-color);
+}
+#state,#district,#month,#soil{
+    width: 110px;
+}
