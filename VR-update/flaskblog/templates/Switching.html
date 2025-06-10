@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="static/stylesswitching.css">
+    <title>Switching Perspective</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fontawesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+</head>
+
+<body>
+    <!-- ... Title bar to display the library, experience and it's type with shortcuts of icons ... -->
+    <header class="title-bar">
+        <span>
+            <span class="title">Library: {{ lib.title }} </span>
+            <span class="title">Experience: {{ con.etitle }} </span>
+            <span class="title">Type: {{ con.ex_type }} </span>
+        </span>
+
+        <!-- Title bar buttons with their functionalities-->
+        <div class="buttons-container">
+            <a class="nav-item nav-link" href="{{ url_for('main.home') }}" onclick="confirmDiscardChanges(event)"><img
+                    class="icon" src="./static/icons/home.png" alt="Home icon"></a>
+                    <img class="icon" src="./static/icons/save.png" alt="save icon" onclick="showSaveAlert()">
+            <a class="nav-item nav-link" href="{{ url_for('posts.switchsettings', experience_id=con.eid) }}">
+                <img class="icon" src="./static/icons/settings.png" alt="Settings icon">
+            </a>
+        </div>
+    </header>
+
+    <!-- -----------------------------------------------  Main content  ----------------------------------------------------------  -->
+
+    <!-- All elements of Left panel for selecting videos and images -->
+    <div class="left-panel-container">
+        <h4 style="text-align:center; color:white">Media Library</h4>
+        <!-- left panel to select and upload videos and save in temp_videos folder and display the files present in that folder -->
+        <div class="left-panel-wrapper">
+            <div class="left-panel">
+                <div class="upload-area">
+                    <!-- <input type="file" accept=".mp4" id="video-input" multiple> -->
+                    {% for video_file in video_files %}
+                    <video controls>
+                        <source id="video-input"
+                            src="{{ url_for('static', filename='Library/' + library_folder_name + '/' + experience_folder_name + '/temp_video/' + video_file) }}"
+                            type="video/mp4">
+                    </video>
+                    <br>
+                    {% endfor %}
+                </div>
+                <ul id="video-list" class="draggable-list">
+                    <!-- Video elements will be added here -->
+                </ul>
+            </div>
+        </div>
+        <!-- video choose and upload to folder buttons -->
+        <div class="video-upload-btn-container">
+            <form method="post" enctype="multipart/form-data" id="uploadForm">
+                <input type="file" name="files[]" multiple accept=".mp4, .mkv" style="width: 200px;">
+                <!-- Hide the default submit button -->
+                <input type="submit" value="Upload" style="display: none;">
+            </form>
+            <button class="btn" onclick="scrollUp()"><i class="fa fa-backward" aria-hidden="true"></i></button>
+            <button class="btn" onclick="document.getElementById('uploadForm').submit()">
+                <i class="fa fa-plus-circle" aria-hidden="true"></i>
+            </button>
+            <button class="btn" onclick="scrollDown()"><i class="fa fa-forward" aria-hidden="true"></i></button>
+        </div>
+
+        <!-- heading of image Library -->
+        <h4 style="text-align:center; color:white">Avatar Library</h4>
+
+        <!-- image display area container to save into temp_images folder and display all present in the folder -->
+        <div class="left-panel-wrapperbe">
+            <!-- Image Display Area -->
+            <input type="file" accept=".jpg,.jpeg" id="image-input" multiple style="display:none;">
+            <div class="media-containerimg">
+                {% for image_file in image_files %}
+                <br>
+                <img
+                    src="{{ url_for('static', filename='Library/' + library_folder_name + '/' + experience_folder_name + '/temp_images/' + image_file) }}">
+                {% endfor %}
+            </div>
+        </div>
+        <!-- Image Upload Button -->
+        <div class="image-upload-btn-container">
+            <form method="post" enctype="multipart/form-data" id="uploadFormI">
+                <input type="file" name="files[]" multiple accept=".png, .jpg, .jpeg, .gif" style="width: 200px;">
+                <input type="hidden" name="target_folder" value="default">
+                <input type="submit" value="Upload" style="display: none;">
+
+            </form>
+            <button class="btn" onclick="document.getElementById('uploadFormI').submit()">
+                <i class="fa fa-plus-circle" aria-hidden="true"></i>
+            </button>
+        </div>
+    </div>
+
+
+    <!-- Centre tag for Add Avatar Button  -->
+    <center>
+        <button onclick="addDropArea()" class="btn">Add Avatar</button>
+        <div id="drop-areas"></div>
+    </center>
+    <!-- {%for i in avatar_all %}
+    {{i.id}}
+    {{i.avatar_name}}
+    {{i.description}}
+    {{i.img}}
+    {{i.video}}
+    {%endfor%}
+    {{avatar_all_length}} -->
+    <!-- Middle container for drag and drop area -->
+    <div class="middle-container" id="middle-container"></div>
+    <!-- Video Preview Modal -->
+    <div class="modal fade" id="videoModal" tabindex="-1" role="dialog" aria-labelledby="videoModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="videoModalLabel">Video Preview</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="videoModalBody">
+                    <!-- Video will be injected here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- -----------------------------------------------  Script content  ----------------------------------------------------------  -->
+    <script>
+        function showSaveAlert() {
+    alert('Changes have been saved!');
+    window.location.href= "{{ url_for('posts.existing_experience') }}";
+}
+        let dropAreaCount = 0;
+
+        function handleFiles(files, dropAreaId) {
+            const preview = document.getElementById('image-preview');
+            for (const file of files) {
+                const fileName_sel = file.name; // Local variable
+                console.log(fileName_sel)
+                var eid = "{{ con.eid }}";
+                console.log("EID Value:", eid);
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    const img = document.createElement('img');
+                    img.src = event.target.result;
+                    img.setAttribute('draggable', true);
+                    img.setAttribute('ondragstart', 'dragStartHandler(event)');
+                    img.style.maxWidth = '200px';
+                    
+                    var avatarOptionUrl = "{{ url_for('posts.avatar_option') }}";
+                    img.onclick = function () {
+                        // Use the global variable for the URL
+                        const url = avatarOptionUrl;
+                        let formData = new FormData();
+                        formData.append('target_folder', 'selected');
+                        formData.append('fileName_sel', fileName_sel); // Use fileName_sel in FormData
+                        formData.append('eid', eid); // Use eid in FormData
+                        fetch(url, {
+                            method: 'POST',
+                            body: formData,
+                            credentials: 'same-origin'
+                        })
+                            .then(response => {
+                                if (response.ok) {
+                                    console.log('POST request successful');
+                                    window.location.href = response.url;
+                                } else {
+                                    console.error('POST request failed');
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error making the POST request:', error);
+                            });
+                    };
+                    // Check if dropAreaId is defined, then add to the corresponding drop area
+                    if (dropAreaId) {
+                        const dropAreaPreview = document.getElementById(dropAreaId + '-preview');
+                        if (dropAreaPreview) {
+                            dropAreaPreview.appendChild(img);
+                            // Create and append the name input
+                            const nameInput = document.createElement('input')
+                        }
+                    } else {
+                        preview.appendChild(img);
+                    }
+                    // Check if dropAreaId is defined, then add to the corresponding drop area
+                    if (dropAreaId) {
+                        const dropAreaPreview = document.getElementById(dropAreaId + '-preview');
+                        if (dropAreaPreview) {
+                            // Append child elements to dropAreaPreview
+                        }
+                    }
+                    // Save chosen files to static/temp_images folder if dropAreaId is not defined
+                    if (!dropAreaId) {
+                        saveChosenFile(file);
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+
+        function addDropArea() {
+            const dropAreas = document.getElementById('middle-container');
+            const dropArea = document.createElement('div');
+            dropArea.className = 'drop-area';
+            dropArea.id = 'drop-area-' + dropAreaCount;
+            dropArea.innerHTML = `<p>Drag and drop your images here</p>`;
+            dropArea.addEventListener('dragover', dragOverHandler);
+            dropArea.addEventListener('drop', event => dropHandler(event, dropArea.id));
+            const dropAreaPreview = document.createElement('div');
+            dropAreaPreview.id = dropArea.id + '-preview';
+            dropArea.appendChild(dropAreaPreview);
+            dropAreas.appendChild(dropArea);
+            dropAreaCount++;
+            // After appending the imageContainer to the dropArea, add the delete button
+            const deleteBtn = document.createElement('button');
+            deleteBtn.innerHTML = '<i class="fa fa-trash" aria-hidden="true"></i>'; // Using Font Awesome trash icon
+            deleteBtn.classList.add('delete-btn'); // Add a class for styling if needed
+            deleteBtn.style.marginTop = '10px'; // Adjust styling as needed
+            deleteBtn.style.backgroundColor = '#0073e6';
+            // Append the delete button to the imageContainer or dropArea based on your layout
+            dropArea.appendChild(deleteBtn); // or dropArea.appendChild(deleteBtn);
+            // Add click event listener to the delete button
+            // Add click event listener to the delete button
+            deleteBtn.addEventListener('click', function () {
+                const confirmDelete = confirm("Are you sure you want to delete this area?");
+                if (confirmDelete) {
+                    // Remove the dropArea or imageContainer from the DOM
+                    dropArea.remove(); // Remove the entire preview container
+                }
+            });
+        }
+
+        function dropHandler(event, dropAreaId) {
+            event.preventDefault();
+            const dt = event.dataTransfer;
+            const files = dt.files;
+            handleFiles(files, dropAreaId);
+            // Save dragged files to static/selected_images folder with area id
+            uploadFiles(files, dropAreaId);
+        }
+
+        function dragOverHandler(event) {
+            event.preventDefault();
+            const dropArea = event.target;
+            dropArea.classList.add('highlight');
+        }
+
+        function dragStartHandler(event) {
+            event.dataTransfer.setData('text/plain', event.target.src);
+        }
+
+        function uploadFiles(files, dropAreaId) {
+            const formData = new FormData();
+            for (const file of files) {
+                formData.append(dropAreaId + '_file', file, file.name); // Append files with filename
+            }
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.text())
+                .then(result => console.log(result))
+                .catch(error => console.error('Error:', error));
+
+            // Save dragged files to static/selected_images folder with area id
+            saveSelectedImages(files, dropAreaId);
+        }
+
+        function saveChosenFile(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            fetch('/save_temp', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.text())
+                .then(result => console.log(result))
+                .catch(error => console.error('Error:', error));
+        }
+        var fileName
+        function saveSelectedImages(files, dropAreaId) {
+            const formData = new FormData();
+            for (const file of files) {
+                formData.append(dropAreaId + '_file', file, file.name);
+                fileName = file.name // Append files with filename
+                // console.log(fileName); // Print the file name to the console
+            }
+
+            fetch('/save_selected', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.text())
+                .then(result => console.log(result))
+                .catch(error => console.error('Error:', error));
+        }
+        // Function to Discard changes in the webpage for clicking on Home button
+        function confirmDiscardChanges(event) {
+            event.preventDefault(); // Prevent the default anchor action
+            const confirmAction = confirm("Discard changes?");
+            if (confirmAction) {
+                // User clicked ok, redirect to the home page
+                window.location.href = event.currentTarget.getAttribute('href');
+            } else {
+                // User clicked cancel, do nothing
+            }
+        }
+
+
+        //Function to make the loaded video dragablle
+        function makeVideosDraggable() {
+            const draggableItems = document.querySelectorAll('.draggable-video');
+            draggableItems.forEach((item) => {
+                item.setAttribute('draggable', 'true');
+                item.addEventListener('dragstart', (event) => {
+                    event.dataTransfer.setData('text/html', event.target.innerHTML);
+                    draggedItem = event.target;
+                });
+            });
+        }
+
+        // Handle video file selection
+        const videoInput = document.getElementById('video-input');
+        const videoList = document.getElementById('video-list');
+        videoInput.addEventListener('change', (event) => {
+            const files = event.target.files;
+            for (let i = 0; i < files.length; i++) {
+                const videoItem = document.createElement('li');
+                videoItem.className = 'draggable-video';
+                const file = event.target.files[i];
+                const videoUrl = URL.createObjectURL(file);
+                videoItem.innerHTML = `<video src="${videoUrl}" controls></video>`; videoList.appendChild(videoItem);
+            }
+            makeVideosDraggable();
+        });
+
+        // Function to display Images on the left panel display area
+        document.getElementById('image-input').addEventListener('change', function (event) {
+            const fileList = event.target.files;
+            const list = document.getElementById('image-list'); // Consider renaming this ID to something more generic like 'media-list'
+            for (let i = 0; i < fileList.length; i++) {
+                if (fileList[i].type.match('image.*')) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        const li = document.createElement('li');
+                        li.classList.add('image-list-item'); // Use the class for styling
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        // No need to set inline styles here, as they are handled by the CSS class
+                        li.appendChild(img);
+                        list.appendChild(li);
+
+                    };
+                    reader.readAsDataURL(fileList[i]);
+                    makeVideosDraggable();
+                }
+            }
+        });
+
+
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const fileInput = document.querySelector('input[type="file"]');
+            const uploadPrompt = document.getElementById('uploadPrompt');
+
+            fileInput.addEventListener('change', function () {
+                if (this.files.length > 0) {
+                    // Show the prompt
+                    uploadPrompt.style.display = 'block';
+                } else {
+                    // Hide the prompt if no files are selected
+                    uploadPrompt.style.display = 'none';
+                }
+            });
+        });
+
+
+
+
+        // --------------------------  Function for the Add avatar button to create drag and drop area -----------------------------------
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const addAreaBtn = document.getElementById('addAreaBtn');
+            const middleContainer = document.querySelector('.middle-container');
+            // Ensure avatarAllLength is correctly parsed as an integer
+            const avatarAllLength = parseInt("{{avatar_all_length}}", 10); // Corrected to ensure proper parsing
+
+            addAreaBtn.addEventListener('click', function () {
+                createDropArea();
+            });
+
+            // Create drop areas based on avatarAllLength
+            for (let i = 0; i < avatarAllLength; i++) {
+                createDropArea();
+            }
+
+            function createDropArea() {
+                const dropArea = document.createElement('div');
+                dropArea.classList.add('drop-area');
+                dropArea.innerHTML = 'Drag and drop Avatar here';
+                middleContainer.appendChild(dropArea);
+                enableDragAndDrop(dropArea);
+            }
+
+            // ---------------  Function for the drag and drop area to retain image with details and redirect it to Add video page  ----------
+
+            function enableDragAndDrop(dropArea) {
+                dropArea.addEventListener('dragover', function (e) {
+                    e.preventDefault(); // Prevent default behavior
+                    dropArea.style.borderColor = 'blue'; // Highlight
+                });
+                dropArea.addEventListener('dragleave', function (e) {
+                    dropArea.style.borderColor = '#ccc'; // Revert highlight
+                });
+                dropArea.addEventListener('drop', function (e) {
+                    e.preventDefault(); // Prevent default behavior
+                    dropArea.style.borderColor = '#ccc'; // Revert highlight
+
+                    // Clear the inner HTML to remove the previous message and set the new message
+                    dropArea.innerHTML = 'Click on Image to Add Video and Descriptions';
+                    // Process dropped files
+                    const files = e.dataTransfer.files;
+                    for (let i = 0; i < files.length; i++) {
+                        if (files[i].type.match('image.*')) {
+
+                            const reader = new FileReader();
+                            reader.onload = function (e) {
+                                // Create a container for the image and inputs
+                                const imageContainer = document.createElement('div');
+                                imageContainer.classList.add('image-container'); // Added class for styling and identification
+                                imageContainer.style.textAlign = 'center'; // Center the contents
+                                imageContainer.style.display = 'flex'; // Use flexbox
+                                imageContainer.style.flexDirection = 'column'; // Arrange items in a column
+                                imageContainer.style.alignItems = 'center'; // Center items horizontally
+                                imageContainer.style.marginBottom = '20px'; // Adjust as needed
+
+                                // Create and append the image
+                                const img = document.createElement('img');
+                                img.src = e.target.result;
+                                img.style.width = '200px'; // Adjust size as needed
+                                img.style.height = '200px';
+                                img.style.objectFit = 'Fill';
+                                imageContainer.appendChild(img);
+                                console.log(imageContainer)
+
+                                var avatarOptionUrl = "{{ url_for('posts.avatar_option',) }}";
+                                img.onclick = function () {
+                                    // Use the global variable for the URL
+                                    const url = avatarOptionUrl;
+                                    let formData = new FormData();
+                                    fetch(url, {
+                                        method: 'POST',
+                                        body: formData,
+                                        credentials: 'same-origin'
+                                    })
+                                        .then(response => {
+                                            if (response.ok) {
+                                                console.log('POST request successful');
+                                                window.location.href = response.url;
+                                            } else {
+                                                console.error('POST request failed');
+                                            }
+                                        })
+                                        .catch(error => {
+                                            console.error('Error making the POST request:', error);
+                                        });
+                                };
+
+
+
+                                // After appending the imageContainer to the dropArea, add the delete button
+                                const deleteBtn = document.createElement('button');
+                                deleteBtn.innerHTML = '<i class="fa fa-trash" aria-hidden="true"></i>'; // Using Font Awesome trash icon
+                                deleteBtn.classList.add('delete-btn'); // Add a class for styling if needed
+                                deleteBtn.style.marginTop = '10px'; // Adjust styling as needed
+                                deleteBtn.style.backgroundColor = '#0073e6';
+
+                                // Append the delete button to the imageContainer or dropArea based on your layout
+                                imageContainer.appendChild(deleteBtn); // or dropArea.appendChild(deleteBtn);
+
+                                // Add click event listener to the delete button
+                                deleteBtn.addEventListener('click', function () {
+                                    const confirmDelete = confirm("Are you sure you want to delete this area?");
+                                    if (confirmDelete) {
+                                        // Remove the dropArea or imageContainer from the DOM
+                                        dropArea.remove(); // or imageContainer.remove();
+                                    }
+                                });
+
+                                // Append the container to the drop area
+                                dropArea.appendChild(imageContainer);
+                            };
+                            reader.readAsDataURL(files[i]);
+                        }
+                    }
+                });
+            }
+        });
+
+
+        function scrollUp() {
+            // Assuming there's a container with the class 'scrollable-area' you want to scroll
+            var container = document.querySelector('.upload-area');
+            // Adjust the '250' to the amount of pixels you want to scroll up
+            container.scrollBy(0, -250);
+        }
+
+        function scrollDown() {
+            // Assuming there's a container with the class 'scrollable-area' you want to scroll
+            var container = document.querySelector('.upload-area');
+            // Adjust the '250' to the amount of pixels you want to scroll down
+            container.scrollBy(0, 250);
+        }
+
+        // JavaScript to detect scroll end and load more content
+        var container = document.querySelector('.scrollable-area');
+        var content = document.querySelector('.content');
+
+
+        var avatars = {{ avatar_all | tojson }};
+
+
+        function createAvatarBoxes() {
+            const middleContainer = document.getElementById('middle-container');
+            var libraryFolderName = "{{ library_folder_name }}";
+            var experienceFolderName = "{{ experience_folder_name }}";
+
+            avatars.forEach(avatar => {
+                
+                const box = document.createElement('div');
+                box.className = 'avatar-box';
+                console.log(libraryFolderName)
+                console.log(experienceFolderName)
+                const imageUrl = `../static/Library/${libraryFolderName}/${experienceFolderName}/selected_images/${avatar.img}`;
+                box.innerHTML = `<center>
+                <img src="${imageUrl}" alt="${avatar.avatar_name}" style="width: 150px; height: 150px;">
+            <div class="avatar-info">
+                
+                <h3>Name: ${avatar.avatar_name}</h3>
+                <p>Description: ${avatar.description}</p>
+                <p>Scrubbing: ${avatar.scrub}</p>
+                 <p onclick="showVideoPreview('${avatar.video}',${avatar.scrub})">Video File: ${avatar.video}</p>
+                <form action="/deletavatar" method="POST"  onsubmit="return showDeleteAlert()">
+                    <input type='hidden' id="del_avatar" name="del_avatar" value='${avatar.avatar_name}'>
+                    <button class="delete-btn" style="background-color:#0073e6;color: #ccc;" tpye='submit'><i class="fa fa-trash" aria-hidden="true"></i></button>
+                </form>
+                </center>
+            </div>
+            
+        `;  middleContainer.appendChild(box);
+    
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            createAvatarBoxes();
+        });
+        function deleteAvatar(name) {
+            console.log(name);
+
+            
+        }
+        function showDeleteAlert() {
+    alert('Are you sure you want to delete this avatar?\nChanges will be saved automatically');
+    return true; // return false if you don't want to submit the form
+}
+        function showVideoPreview(videoUrl,scrub) {
+            // Create the video element
+            var libraryFolderName = "{{ library_folder_name }}";
+            var experienceFolderName = "{{ experience_folder_name }}";
+            const videoElement = document.createElement('video');
+            videoElement.src = `../static/Library/${libraryFolderName}/${experienceFolderName}/selected_video/${videoUrl}`;
+            if (scrub==1)
+            {
+                videoElement.controls = true;
+            }
+            else
+            {
+                videoElement.controls = false;
+            }
+            videoElement.style.width = '100%'; // Set the width to fit the modal
+
+            // Create or use an existing modal element
+            const modalBody = document.getElementById('videoModalBody');
+            modalBody.innerHTML = ''; // Clear previous content
+            modalBody.appendChild(videoElement);
+
+            // Show the modal
+            $('#videoModal').modal('show');
+        }
+
+    </script>
+</body>
+
+</html>

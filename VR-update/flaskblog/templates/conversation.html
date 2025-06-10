@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="static/styles.css">
+    <title>Conversation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fontawesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+
+    <!-- ... (existing meta tags and stylesheets) ... -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+        integrity="sha512-w9SNJ2fE/GxwA3s56Hr5D9ZGGC6x5KGQ1r1C6kHtvDPzv68gRhDnxJo+JI9nrmy2O3tgZDnATBU5FGiUZ0MsUg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body>
+    <header class="title-bar">
+        <span>
+            <span class="title">Library: {{ lib.title }} </span>
+
+
+            <span class="title">Experience: {{ con.etitle }} </span>
+
+
+            <span class="title">Type: {{ con.ex_type }} </span>
+
+        </span>
+
+
+        <div class="buttons-container">
+            <a class="nav-item nav-link" href="{{ url_for('main.home') }}"><img class="icon" src="./static/icons/home.png" alt="Home icon"></a>
+            <img class="icon" src="./static/icons/save.png" alt="save icon" id="update-btn">
+            <img class="icon" src="./static/icons/settings.png" alt="Home icon">
+           
+        </div>
+    </header>
+    <div class="left-panel-container">
+        <h4 style="text-align:center; color:white">Media Library</h4>
+        <div class="left-panel-wrapper">
+            <div class="left-panel">
+                <div class="upload-area">
+                    <!-- <input type="file" accept=".mp4" id="video-input" multiple> -->
+                    {% for video_file in video_files %}
+                    <div draggable="true" ondragstart="drag(event)">
+                        <video controls>
+                            <source id="video-input"
+                                src="{{ url_for('static', filename='Library/' + library_folder_name + '/' + experience_folder_name + '/temp_video/' + video_file) }}"
+                                type="video/mp4">
+                        </video>
+                        <center>
+                            {{video_file}}
+                        </center>
+                        <br>
+                    </div>
+                    {% endfor %}
+                </div>
+                <ul id="video-list" class="draggable-list">
+                    <!-- Video elements will be added here -->
+                </ul>
+            </div>
+        </div>
+
+        <div class="video-upload-btn-container">
+            <form method="post" enctype="multipart/form-data" id="uploadForm">
+                <input type="file" name="files[]" multiple accept=".mp4, .mkv" style="width: 200px;">
+                <!-- Hide the default submit button -->
+                <input type="submit" value="Upload" style="display: none;">
+            </form>
+            <button class="btn" onclick="scrollUp()"><i class="fa fa-backward" aria-hidden="true"></i></button>
+            <button class="btn" onclick="document.getElementById('uploadForm').submit()">
+                <i class="fa fa-plus-circle" aria-hidden="true"></i>
+            </button>
+            <button class="btn" onclick="scrollDown()"><i class="fa fa-forward" aria-hidden="true"></i></button>
+        </div>
+        <br><br><br><br><br>
+        <div class="btn-control1">
+
+            <button class="btn" onclick="showfb(),checkElementsInClass()"> <i class="fa fa-thumbs-up"></i><i
+                    class="fa fa-thumbs-down"></i>
+                Add FeedBack</button>
+            <br>
+            <br>
+            <br>
+            <button class="btn" onclick="cancel()">Cancel</button>
+        </div>
+
+
+    </div>
+
+
+    <div class=middle-container>
+        <div class="scrollable-area">
+            <div class="content">
+               
+                <!-- Button to reveal the other rectangles -->
+
+                <br>
+                <script>
+                    function allowDrop(event) {
+                        event.preventDefault();
+                    }
+
+                    
+
+                    function drop(event) {
+                        event.preventDefault();
+                        var data = event.dataTransfer.getData("text");
+                        event.target.innerHTML = data;
+                        var video = event.target.querySelector('video');
+                        if (video) {
+                            video.width = 320; // Set the width to match other videos
+                            video.height = 240; // Set the height to match other videos
+                            var source = video.querySelector('source');
+                            var src = source.getAttribute('src');
+                            var filename = src.substring(src.lastIndexOf('/') + 1);
+                            fetch('/save_video', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ filename: filename })
+                            })
+                                .then(response => response.text())
+                                .then(data => console.log(data))
+                                .catch(error => console.error(error));
+                        }
+                    }
+                    function options() {
+                        window.location.href = "{{ url_for('posts.options') }}";
+                    }
+
+                </script>
+                <!-- <form action="/options" method="GET">
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    <button type="submit" onclick="clearCounts()" class="styled-button"
+                        style="margin-left: 430px; width: 140px;">Add Dialog</button>
+
+                    <div id="added-options-container"></div>
+
+                </form>
+                <br>
+                <center>
+                    <button id="generateRectanglesButton" class="styled-button"
+                        onclick="generateRectangles(),generateRectanglesO()">Show Options</button>
+                    <div>Question options available :1</div>
+                    <div id="video-structure2"></div>
+                    <div id="video-structure3"></div>
+                </center>
+                <h4>Dialog :{{question}}</h4>
+                <h4 id="optionCountDisplay"></h4>
+
+                <div>
+                    <center>
+                        <div class="bottom-rectangles-container"></div>
+                    </center>
+                </div>
+
+                <h4 id="optionCountDisplay1" style="display: none;"></h4>
+                <div>
+                    <div class="bottom-rectangles-containerO"></div>
+                </div> -->
+    <center>          <div class="tree-container">
+ 
+                    <div class="tree">
+                        <ul id="tree-root">
+                           
+                                <li data-id="0">
+                                <a href="#" onclick="addNode(event)">Root (0)
+                                </a>
+                                <button>add</button>
+                                <div id="drop-area" style="border: 2px dashed black; width: 320px; height: 240px; "ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                                    <p>Drag and drop videos here</p>
+                                </div>
+                                
+                            </li> 
+
+                        </ul>
+                    </div> 
+                </div>
+</center>
+                <!-- Add Update Button -->
+                
+
+                <!-- Container for displaying videos -->
+
+                <!-- Add Bootstrap JavaScript CDN here if needed -->
+                <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script> -->
+
+                <!-- Add your JavaScript file here -->
+                <script src="../static/script.js"></script>
+
+
+
+
+            </div>
+        </div>
+    </div>
+    <script>
+        // JavaScript to detect scroll end and load more content
+        var container = document.querySelector('.scrollable-area');
+        var content = document.querySelector('.content');
+
+
+    </script>
+
+
+
+
+    <script>
+        function checkElementsInClass() {
+            var container = document.querySelector('.bottom-rectangles-containerO');
+            if (container.hasChildNodes()) {
+                console.log('The container has elements inside it.');
+            } else {
+                console.log('The container is empty.');
+            }
+        }
+        // Make the video items draggable *************************
+
+        function makeVideosDraggable() {
+            const draggableItems = document.querySelectorAll('.draggable-video');
+            draggableItems.forEach((item) => {
+                item.setAttribute('draggable', 'true');
+                item.addEventListener('dragstart', (event) => {
+                    event.dataTransfer.setData('text/html', event.target.innerHTML);
+                    draggedItem = event.target;
+                });
+            });
+        }
+
+        // Handle file selection
+        const videoInput = document.getElementById('video-input');
+        const videoList = document.getElementById('video-list');
+        videoInput.addEventListener('change', (event) => {
+            const files = event.target.files;
+            const formData = new FormData();
+            for (let i = 0; i < files.length; i++) {
+                formData.append('videos', files[i]);
+                const fileURL = URL.createObjectURL(files[i]); // Get URL of the uploaded file
+                console.log(fileURL); // Log the URL to the console
+            }
+        });
+        // *********************************************
+
+
+
+
+        // button scrollable  ***********************************************
+        const scrollStep = 100; // Change this to adjust the amount of scrolling
+        const leftPanelWrapper = document.querySelector('.left-panel-wrapper');
+
+        function scrollUp() {
+            leftPanelWrapper.scrollTop -= scrollStep;
+        }
+
+        function scrollDown() {
+            leftPanelWrapper.scrollTop += scrollStep;
+        }
+
+        // ****************************************************
+        let optionCount = 0;
+        if ("{{ optionCount }}" == "None") {
+            optionCount = parseInt(sessionStorage.getItem('optionCount')) || 0;
+        }
+        else {
+            optionCount = parseInt("{{ optionCount }}") || 0;
+            sessionStorage.setItem('optionCount', optionCount);
+        }
+        console.log(optionCount);
+        optionCount=0
+        // document.getElementById("optionCountDisplay").textContent = " Dialog options available :" + optionCount;
+        // document.getElementById("video-structure2").textContent = " Question options available :" + optionCount;
+
+
+
+        function generateRectangles() {
+            const buttonCount = "{{optionCount}}";
+            // const buttonCount = '{{optionCount}}'; // Change this to the desired number of rectangles
+            const container = document.querySelector('.bottom-rectangles-container');
+            // Clear any existing content
+            container.innerHTML = '';
+            var current_show = [
+                { text: 'ID: {{ current_show[0].option_id if current_show.count() > 0 else "NONE" }} Option 1: {{ current_show[0].option_txt if current_show.count() > 0 else "NONE" }}' },
+                { text: 'ID: {{ current_show[1].option_id if current_show.count() > 1 else "NONE" }} Option 2: {{ current_show[1].option_txt if current_show.count() > 1 else "NONE" }}' },
+                { text: 'ID: {{ current_show[2].option_id if current_show.count() > 2 else "NONE" }} Option 3: {{ current_show[2].option_txt if current_show.count() > 2 else "NONE" }}' }
+            ];
+
+
+            console.log(current_show);
+            // Generate rectangles and "Add File" buttons based on buttonCount
+            for (i = 0; i < buttonCount; i++) {
+
+                const rectangleContainer = document.createElement('div');
+                rectangleContainer.innerHTML = `
+                <div class='title'>
+                   
+                    <p style="color: black;"> ${current_show[i].text}</p>
+                 </div>
+                    <div class="drag-drop-rectangle1" ondragover="allowDrop(event)" ondrop="drop(event)">
+                        Drop Videos Here
+                    </div>
+                    <div class="add-file-button-container">
+                            <form action='/options_options' id='dialog'>
+                            <button type="submit" class="styled-button">Add Dialog</button></form>
+                           <br> <button  id='fb' type="submit" onclick="feedback()" class="styled-button" style="visibility: hidden;">Feedback</button>
+                    </a>
+                    </div>  
+                `;
+                container.appendChild(rectangleContainer);
+
+            }
+        }
+        function saveState() {
+            const videoItems = Array.from(document.querySelectorAll('.draggable-video'));
+            const state = videoItems.map((item) => {
+                const videoSrc = item.querySelector('video').src;
+                return { src: videoSrc, dragged: item.getAttribute('draggable') === 'true', parent: getParentIndex(item) };
+            });
+            sessionStorage.setItem('videoState', JSON.stringify(state));
+        }
+
+
+        function openPopup() {
+            var url = "{{ url_for('posts.options_options') }}";
+
+            // Define the size and other properties of the popup window
+            var width = 1200;
+            var height = 1200;
+            var left = (screen.width - width) / 2;
+            var top = (screen.height - height) / 2;
+            var options = "width=" + width + ",height=" + height + ",left=" + left + ",top=" + top;
+
+            // Open the popup window
+            window.open(url, "Popup", options);
+
+        }
+        function receiveDataFromPopup(optionCountO) {
+            // Do something with the received data
+
+            console.log("Received data from popup:", optionCountO);
+        }
+
+        let optionCountO = 0;
+        let currentOptionCountO
+        let previousOptionCountO
+        let totalOptionCountO
+        function test2() {
+            optionCountO = 0;
+            otalOptionCountO = 0;
+
+        }
+        if ("{{ optionCountO }}" == "None") {
+            optionCountO = parseInt(sessionStorage.getItem('optionCountO')) || 0;
+        }
+        else {
+            previousOptionCountO = parseInt(sessionStorage.getItem('optionCountO')) || 0;
+            currentOptionCountO = parseInt("{{ optionCountO }}") || 0;
+            if ("{{ optionCountO }}" != "None") {
+                sessionStorage.setItem('optionCountO', currentOptionCountO);
+            }
+            totalOptionCountO = previousOptionCountO + currentOptionCountO;
+            currentOptionCountO = totalOptionCountO;
+            // optionCountO = parseInt("{{ optionCountO }}") || 0;
+            // sessionStorage.setItem('optionCountO', optionCountO);
+        }
+        console.log(optionCountO);
+        console.log(previousOptionCountO);
+        console.log(currentOptionCountO);
+        console.log(totalOptionCountO);
+        // document.getElementById("optionCountDisplay1").textContent = " Dialog options available :" + totalOptionCountO;
+
+        // document.getElementById("video-structure3").textContent = " Question options available :" + totalOptionCountO;
+
+        function generateRectanglesO() {
+            document.getElementById("optionCountDisplay1").style.display = 'block'
+            const buttonCount1 = totalOptionCountO;
+            // Change this to the desired number of rectangles
+            const container = document.querySelector('.bottom-rectangles-containerO');
+            // Clear any existing content
+            container.innerHTML = '';
+
+            // Generate rectangles and "Add File" buttons based on buttonCount
+            for (let i = 0; i < buttonCount1; i++) {
+                const rectangleContainer = document.createElement('div');
+                rectangleContainer.innerHTML = `
+                    <div class="drag-drop-rectangle1" ondragover="allowDrop(event)" ondrop="drop(event)">
+                        Drop Videos Here
+                    </div>
+                    <div class="add-file-button-container">
+                            <button  onclick="openPopup()" class="styled-button">Add Dialog</button>
+                            <br>
+                            <button id='fb1' type="submit" onclick="feedback()" class="styled-button" style="visibility: hidden;">Feedback</button>
+                    </a>
+                    </div>
+                `;
+                container.appendChild(rectangleContainer);
+            }
+        }
+
+        function clearCounts() {
+            optionCount = 0;
+            totalOptionCountO = 0;
+            // If you want to clear the counts in the sessionStorage as well
+            sessionStorage.setItem('optionCount', optionCount);
+            sessionStorage.setItem('optionCountO', totalOptionCountO);
+        }
+        function showfb() {
+            var fbElement1 = document.getElementById("fb1");
+            var fbElement = document.getElementById("fb");
+            var fbElements = document.querySelectorAll('.styled-button');
+            var container = document.querySelector('.bottom-rectangles-containerO');
+            if (container.hasChildNodes()) {
+                if (fbElement1.style.visibility === 'visible') {
+                    fbElement1.style.visibility = 'hidden';
+                } else {
+                    fbElement1.style.visibility = 'visible';
+                }
+
+                // fbElement.forEach(function (fbElement) {
+                //     if (fbElement1.style.visibility === 'visible') {
+                //         fbElement1.style.visibility = 'hidden';
+                //     } else {
+                //         fbElement1.style.visibility = 'visible';
+                //     }
+                // });
+            }
+            else {
+                if (fbElement.style.visibility === 'visible') {
+                    fbElement.style.visibility = 'hidden';
+                } else {
+                    fbElement.style.visibility = 'visible';
+                }
+                // fbElements.forEach(function (fbElement) {
+                //     if (fbElement.style.visibility === 'visible') {
+                //         fbElement.style.visibility = 'hidden';
+                //     } else {
+                //         fbElement.style.visibility = 'visible';
+                //     }
+                // });
+                console.log('The container is empty.');
+            }
+
+
+        }
+        function feedback() {
+            window.location.href = "{{ url_for('posts.Feedbackcon') }}"
+        }
+        function cancel() {
+            var confirmation = confirm("Are you sure you want to discard changes and go to the home page?");
+            if (confirmation) {
+                window.location.href = "{{ url_for('main.home') }}";
+            }
+        }
+    </script>
+
+</body>
+
+</html>

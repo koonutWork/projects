@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="static/stylesavataroption.css">
+    <title>Conversation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fontawesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <!-- ... (existing meta tags and stylesheets) ... -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+        integrity="sha512-w9SNJ2fE/GxwA3s56Hr5D9ZGGC6x5KGQ1r1C6kHtvDPzv68gRhDnxJo+JI9nrmy2O3tgZDnATBU5FGiUZ0MsUg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body>
+    <header class="title-bar">
+        <span class="title"> Link Video to Avatar</span>
+        <div class="buttons-container">
+            <a class="nav-item nav-link" href="{{ url_for('main.home') }}" onclick="confirmDiscardChanges(event)"><img
+                    class="icon" src="./static/icons/home.png" alt="Home icon"></a>
+            <img class="icon" src="./static/icons/save.png" alt="Home icon">
+            <a class="nav-item nav-link" href="{{ url_for('posts.switchsettings') }}">
+                <img class="icon" src="./static/icons/settings.png" alt="Settings icon"></a>
+        </div>
+
+    </header>
+    <div class="container">
+        <h2 style="text-align: center;">Choose name and video for the avatar</h2>
+        <br>
+        <form action="{{ url_for('posts.switching')}}" id="scoreForm" method="post">
+            <div id="fileNameContainer">{{ avatar_image_name }}</div>
+            <p>{{ex_id}}</p>
+            <input type="hidden" id="avatar_image" name="avatar_image" value="{{ avatar_image_name }}">
+            <input type="hidden" id="ex_id" name="ex_id" value="{{ ex_id }}">
+            <input type="hidden" id="selectedVideoPath" name="selectedVideoPath">
+
+            <label for="Avatarname" style="width: 720px;">Avatar Name:</label>
+            <input type="text" id="Avatarname" name="name" required>
+
+            <label for="Avatardescription" style="width: 120px;">Description:</label>
+            <textarea id="Avatardescription" name="description" required rows="4"></textarea>
+            <br>
+            <label for="Videolist" style="width: 120px;">video lists</label>
+            <div class="video-container">
+                {% for video_file in video_files %}
+                <video controls onclick="selectVideo(event)">
+                    <source
+                        src="{{ url_for('static', filename='Library/' + library_folder_name + '/' + experience_folder_name + '/temp_video/' + video_file) }}"
+                        type="video/mp4">
+                </video>
+                <br>
+                {% endfor %}
+            </div>
+            <br>
+            <!-- Scrubbing allowed switch -->
+            <div>
+                <span>Scrubbing allowed:</span>
+                <label class="switch">
+                    <input type="checkbox" id="scrubSwitch" onchange="toggleSwitch('scrubSwitch')" value=0 name="scrub">
+                    <span class="slider round"></span>
+                </label>
+                <span id="scrubSwitchStatus"></span> <!-- Moved after the slider -->
+            </div>
+
+            <!-- Going back to the main page allowed switch -->
+            <div>
+                <span>Going back to the main page allowed:</span>
+                <label class="switch">
+                    <input type="checkbox" id="mainPageSwitch" onchange="toggleSwitch('mainPageSwitch')" value=0
+                        name="main_p">
+                    <span class="slider round"></span>
+                </label>
+                <span id="mainPageSwitchStatus"></span> <!-- Moved after the slider -->
+            </div>
+            <br>
+            <input type="hidden" name="video_files">
+            <div style="align-items: center;">
+                <button type="submit" class="btn" style="margin-right: 10px;"> Save </button>
+                <button type="button" class="btn" onclick="cancelForm()">Cancel</button>
+            </div>
+        </form>
+
+
+    </div>
+
+    <script>
+        document.getElementById('avatar_image').value = videoPath;
+        $.post('{{ url_for("posts.switching") }}', formData, function (response) {
+            // Assuming the backend sends a response indicating success
+            if (response.success) {
+                // Display a message to the user
+                alert('Selected video has been saved.');
+
+                // Redirect the user to the '/switching' page
+                window.location.href = '{{ url_for("posts.switching") }}';
+            }
+        });
+        $(document).ready(function () {
+            // Bind form submission event
+            $('#scoreForm').submit(function (event) {
+                event.preventDefault(); // Prevent the default form submission
+
+                var formData = $(this).serialize(); // Serialize form data
+
+                // Send the form data to the server (adjust the URL to your backend endpoint)
+                $.post('{{ url_for("posts.switching") }}', formData, function (response) {
+                    // Assuming the backend sends a response indicating success
+                    if (response.success) {
+                        // Display a message to the user
+                        alert('Selected video has been saved.');
+                    }
+                });
+            });
+        });
+
+
+
+        function selectVideo(event) {
+            // Remove highlight from all videos
+            document.querySelectorAll('.video-container video').forEach(video => {
+                video.style.outline = 'none';
+            });
+
+            // Ensure the target of the event is a video element before applying the outline
+            if (event.target.tagName === 'VIDEO') {
+                // Highlight the selected video
+                event.target.style.outline = '2px solid blue';
+
+                // Set the selected video's path to the hidden input
+                var videoPath = event.target.querySelector('source').src;
+                document.getElementById('selectedVideoPath').value = videoPath;
+                var video_files = videoPath.split('/').pop();
+                document.getElementsByName('video_files')[0].value = video_files;
+                document.getElementById('selectedVideoPath').value = video_files;
+                console.log(video_files);
+
+                // Set video dimensions and post filename to server
+                event.target.width = 320; // Set the width to match other videos
+                event.target.height = 240; // Set the height to match other videos
+                var source = event.target.querySelector('source');
+                var src = source.getAttribute('src');
+                var filename = src.substring(src.lastIndexOf('/') + 1);
+                fetch('/save_video', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ filename: filename })
+                })
+                    .then(response => response.text())
+                    .then(data => console.log(data))
+                    .catch(error => console.error(error));
+            }
+        }
+
+
+
+
+        // Function for scrollable switch button
+        function toggleSwitch(switchId) {
+            var checkbox = document.getElementById(switchId);
+            var statusElementId = switchId + "Status"; // Construct the ID of the status element
+            var statusElement = document.getElementById(statusElementId); // Get the status element
+            if (checkbox.checked) {
+                statusElement.textContent = "On";
+                checkbox.value = 1;
+            } else {
+                statusElement.textContent = "Off";
+                checkbox.value = 0;
+            }
+        }
+
+    </script>
+
+</body>
+
+</html>

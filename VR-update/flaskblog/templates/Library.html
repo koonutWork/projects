@@ -1,0 +1,65 @@
+{% extends "layout.html" %}
+{% block content %}
+  <article class="media content-section">
+    
+    <div class="media-body">
+      
+       <div style="border-bottom: 1px solid #e3e3e3;">
+        <center>
+
+        <h2 class="article-title">Library: {{ post.title }}</h2>
+      <p class="article-content" >Description: {{ post.content }}</p> {% if post.author == current_user %}{% endif %}
+        <h4>Choose the Experience that you want to edit or create a new one.</h4>
+      </center>
+       </div> 
+      <h1 style="margin-left: 20px;">Experience List</h1>
+        <ul>
+            {% for experience in experiences %}
+            <li><form  action="{{ url_for('posts.post', post_id=post.id,exp_id=exper_id ) }}" method="POST">
+                {%if experience.ex_type =='Conversation' %}
+                <a style="display: inline-block;" href=" {{ url_for('posts.conversationlist',library_id=post.id,experience_id=experience.eid) }}">{{ experience.etitle }} - {{ experience.ex_type }}</a>
+                <button type="submit" name="eid" class="btn btn-danger btn-sm m-1" value='{{experience.eid}}'>Delete</button>
+                {%elif experience.ex_type =='Switching' %}
+                <a style="display: inline-block;" href=" {{ url_for('posts.switchinglist',library_id=post.id,experience_id=experience.eid) }}">{{ experience.etitle }} - {{ experience.ex_type }}</a>
+                <button type="submit" name="eid" class="btn btn-danger btn-sm m-1" value='{{experience.eid}}'>Delete</button>
+                {%elif  experience.ex_type =='Virtualtour' %}
+                <a style="display: inline-block;" href=" {{ url_for('posts.virtualtourlist',library_id=post.id,experience_id=experience.eid) }}">{{ experience.etitle }} - {{ experience.ex_type }}</a>
+                <button type="submit" name="eid" class="btn btn-danger btn-sm m-1" value='{{experience.eid}}'>Delete</button>
+                {% endif %}
+              </form></li>
+            {% endfor %}
+        </ul>
+        <center>
+          <div style=" margin-top: 10px;">
+            <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{{ url_for('posts.update_post', post_id=post.id) }}">Update Library</a>
+            <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{{ url_for('posts.new_experience', post_id=post.id) }}">Create New Experience</a>
+            <button type="button" class="btn btn-danger btn-sm m-1" data-toggle="modal" data-target="#deleteModal">Delete</button>
+          </div>
+        </center>
+        
+    </div>
+    
+    <script>
+      
+    </script>
+  </article>
+  <!-- Modal -->
+  <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteModalLabel">Delete Post?</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <form action="{{ url_for('posts.delete_post', post_id=post.id) }}" method="POST">
+            <input class="btn btn-danger" type="submit" value="Delete">
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

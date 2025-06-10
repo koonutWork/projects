@@ -1,0 +1,418 @@
+/* ------------  Title bar CSS  ------------------------ */
+
+.title-bar {
+    background-color: #2bcc9c;
+    /* Green color */
+    padding: 13px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.title {
+    color: white;
+    font-size: 20px;
+    /*font-weight: bold;*/
+    margin-left: 40px;
+}
+
+/* ------------  Title bar icons CSS  ------------------------ */
+
+.buttons-container {
+    display: flex;
+}
+
+.icon {
+    /*background-image: url("./static/icons/home.png");*/
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: transparent;
+    color: #ffffff;
+    height: 30px;
+    width: 30px;
+    display: block;
+    margin-left: 60px;
+}
+
+.icon:hover {
+    transform: scale(1.1);
+    transition: transform 0.3s;
+    color: blue;
+}
+
+
+/* **************** Left panel ********************/
+
+.left-panel-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    /* Adjust this based on your layout's needs */
+}
+
+.left-panel-container {
+    float: left;
+    width: 20%;
+    height: 94vh;
+    overflow: hidden;
+    /* Hide the scrollbar initially */
+    position: relative;
+    background-color: #2bcc9c;
+}
+
+.left-panel-container::before {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 100%;
+    width: 5px;
+    /* Adjust the width of the border */
+    height: 17px;
+    background-color: #0073e6;
+    /* Adjust the color of the border */
+}
+
+/* --------------- Left panel wrapper ---------------- */
+
+.left-panel-wrapper {
+    position: relative;
+    height: 44%;
+    background-color: #b6f8e4;
+    /* Very light blue color for the left side background */
+    overflow-y: auto;
+    /* Use auto to show scrollbar when content overflows */
+    margin-right: -17px;
+    /* Adjust for the hidden scrollbar width */
+}
+
+/* -------- Left panel ----------------- */
+.left-panel {
+    display: flex;
+    flex-direction: column;
+    height: 150px;
+    /* Ensure it fills the parent container */
+    width: 300px;
+
+    margin: 0 auto;
+    display: block;
+    margin-bottom: 1em;
+}
+
+.upload-area {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    /* This will space out the videos evenly */
+    overflow-y: auto; /* This enables vertical scrolling if the content overflows */
+}
+
+.upload-area video {
+    flex: 1 1 48%;
+    /* This allows each video to take up to 48% of the container width, fitting two videos per line */
+    margin-bottom: 20px;
+    /* Adds some space between rows of videos */
+}
+
+.left-panel input[type="file"] {
+    display: none;
+}
+
+.video-upload-btn-container {
+    flex: 1;
+    /* 10% of the space */
+    display: flex;
+    justify-content: center;
+    /* Center the button horizontally */
+    align-items: center;
+    /* Center the button vertically */
+    justify-content: space-around;
+    /* Adjusts spacing around items, change as needed */
+    margin-right: 2px;
+    margin-left: 2px;
+    margin-top: 6px;
+}
+
+/* ------------- left pannel button -------------------*/
+.btn {
+    background-color: DodgerBlue;
+    border: none;
+    color: white;
+    padding: 10px 8px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.btn-control {
+    /*margin-left: 80px;
+    margin-top: 330px;*/
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* ---------- Image container ---------  */
+.media-container,
+.media-containerimg {
+    flex: 4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* 40% of the space */
+    overflow: auto;
+    /* To handle overflow of content */
+}
+
+.media-container,
+.media-containerimg {
+    overflow-y: auto;
+}
+
+
+.media-containerimg img {
+    width: 240px;     /* Adjust the width as needed */
+    height: 170px;    /* Adjust the height as needed */
+    border: 2px solid #858181;    /* This creates a boundary. Adjust color and width as needed */
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);    /* This adds a shadow effect */
+    object-fit: fill;    /* This ensures the image covers the area without losing its aspect ratio */
+}
+
+
+
+.btn-control,
+.image-upload-btn-container {
+    flex: 1;
+    /* 10% of the space */
+    display: flex;
+    justify-content: center;
+    /* Center the button horizontally */
+    align-items: center;
+    /* Center the button vertically */
+}
+
+/* Add a container for the image upload button to use Flexbox */
+.image-upload-btn-container {
+    display: flex;
+}
+
+/* Ensure the video and image containers scroll if content overflows */
+
+
+
+
+
+
+
+
+.left-panel-wrapperbe {
+    position: relative;
+    height: 44%;
+    /* margin-top: 60%; */
+    background-color: #b6f8e4;
+    /* Very light blue color for the left side background */
+    overflow-y: auto;
+    /* Use auto to show scrollbar when content overflows */
+    margin-right: -17px;
+    /* Adjust for the hidden scrollbar width */
+}
+
+
+
+
+
+.images-container {
+    height: 40%;
+    overflow-y: auto;
+    /* Allows scrolling if content exceeds container height */
+    margin-top: 56%;
+}
+
+/* ************* Left Panel Video *********************/
+
+video {
+    max-width: 100%;
+    height: auto;
+    scroll-margin-right: -2px;
+    /* Adjust the right margin as needed */
+    scroll-margin-left: 1px;
+    /* Adjust the left margin as needed */
+    flex-basis: 50%;
+    padding: 0;
+}
+
+.draggable-list {
+    list-style-type: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    justify-content: space-between;
+    margin-right: -10px;
+}
+
+.draggable-list li {
+    cursor: grab;
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+    width: calc(50% - 10px);
+    margin: 5px;
+    padding: 5px;
+}
+
+
+/***************************** Right Panel ***********************************/
+/*Utilize this if only two panels are required */
+
+.right-panel {
+    float: right;
+    width: 80%;
+    overflow: auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-content: flex-start;
+}
+
+.right-panel-container {
+    float: right;
+    /* Change from float: right to float: left to align right */
+    width: 20%;
+    height: 94vh;
+    overflow: hidden;
+    /* Hide the scrollbar initially */
+    position: relative;
+}
+
+.right-panel-wrapper {
+    position: relative;
+    height: 100%;
+    background-color: #b6f8e4;
+    /* Very light blue color for the right side background */
+    overflow-y: auto;
+    /* Use auto to show scrollbar when content overflows */
+    margin-left: -17px;
+    /* Adjust for the hidden scrollbar width */
+}
+
+.right-panel-container::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    width: 100%;
+    height: 17px;
+    /* Adjust as needed based on your scrollbar width */
+    background-color: #e6f8a4;
+    /* Match the very light blue color */
+}
+
+/* ********************************************************************************************************* */
+
+/* -------------------- Middle Container -------------------*/
+
+/* Style for the Middle Container */
+.middle-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-left: 20%;
+    overflow-x: auto;
+    /* Enable horizontal scrolling */
+    overflow-y: auto;
+    /* Enable vertical scrolling */
+    width: 1520px;
+    /* Corrected: removed quotes */
+    height: 900px;
+    /* Corrected: removed quotes */
+}
+
+/* Style for the drag-and-drop rectangles */
+.drag-drop-rectangle {
+    margin-top: 5%;
+    border: 2px dashed #ccc;
+    padding: 15px;
+    margin-bottom: 10px;
+    width: 100px;
+}
+
+.drag-drop-rectangle1 {
+    margin-left: 32px;
+    margin-top: 5%;
+    border: 2px dashed #ccc;
+    padding: 15px;
+    margin-bottom: 10px;
+    width: 100px;
+}
+
+
+/* -----------------  Styles for the Add Avatar Button  ------------------------- */
+
+#addAreaBtn {
+    background: linear-gradient(45deg, #007BFF, #00BCD4);
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-family: 'Arial', sans-serif;
+    font-weight: bold;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+#addAreaBtn:hover {
+    background: linear-gradient(45deg, #00BCD4, #007BFF);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+}
+
+/* ------------ Styles for the Image items and its lists ------------------------------ */
+.image-list-item {
+    width: 150px;
+    height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.image-list-item img {
+    width: 100%;
+    /* Make the image fully occupy the li's width */
+    height: 100%;
+    /* Make the image fully occupy the li's height */
+    object-fit: cover;
+    /* This will ensure the aspect ratio is maintained */
+}
+
+
+/* --------------------  Drop area styles  --------------------------------- */
+.drop-area {
+    border: 2px dashed #ccc;
+    padding: 2rem;
+    width: calc(50% - 160px); /* Adjusted width to fit two per line, accounting for margins */
+    max-width: 500px;
+    height: auto;
+    color: #ccc;
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-left: 20px; /* Adjusted margins */
+    margin-right: 20px; /* Adjusted margins */
+}
+
+
+.avatar-box {
+    border: 1px solid #ccc;
+    padding: 40px;
+    margin: 10px;
+    display: inline-block;
+}
+
+.avatar-info {
+    margin-bottom: 10px;
+}

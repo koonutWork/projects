@@ -1,0 +1,274 @@
+.title-bar {
+    background-color: #2bcc9c;
+    /* Green color */
+    padding: 13px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.title {
+    color: white;
+    font-size: 20px;
+    /*font-weight: bold;*/
+    margin-left: 40px;
+}
+
+.buttons-container {
+    display: flex;
+}
+
+.icon {
+    /*background-image: url("./static/icons/home.png");*/
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: transparent;
+    /* Added this line */
+    color: #ffffff;
+    height: 30px;
+    width: 30px;
+    display: block;
+    margin-left: 60px;
+    /* Other styles here */
+}
+
+.icon:hover {
+    transform: scale(1.1);
+    transition: transform 0.3s;
+    color: blue;
+}
+
+/* ------------------ Container class styles  --------------------------- */
+
+.container {
+    margin: 0 auto;
+    /* Center the container */
+    max-width: 720px;
+    /* Adjust the width as needed */
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    /* Shadow effect */
+    padding: 20px;
+    /* Add some padding inside the container */
+}
+
+
+
+/* ------------------  Styles for the Name and Description  --------------------------  */
+
+.input,
+textarea {
+    width: 100%;
+    /* Adjust based on your layout */
+    padding: 30px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.input:focus,
+textarea:focus {
+    outline: none;
+    box-shadow: 0 0 5px rgba(81, 203, 238, 1);
+}
+
+textarea {
+    resize: vertical;
+    /* Allows vertical resizing, you could use 'both' for both directions */
+    max-width: 100%;
+    /* Ensures it does not exceed the container */
+}
+
+/* Futuristic style example */
+.input,
+textarea {
+    background: #f3f3f3;
+    /* Light background */
+    border: none;
+    border-bottom: 2px solid #cbdaf0;
+    /* Blue border for a modern look */
+    font-family: 'Arial', sans-serif;
+    /* Modern font */
+}
+
+/* ---------------------  Video styles  ----------------------------- */
+/* Styles for video container and video list */
+.video-container {
+    width: 100%; /* Makes the container fill the full width */
+    display: flex; /* Enables a flexbox layout */
+    flex-wrap: wrap; /* Allows items to wrap as needed */
+    gap: 10px; /* Adds some space between the videos */
+    justify-content: center; /* Centers the videos horizontally */
+}
+
+.video-container video {
+    width: 250px; /* Makes each video fill the container */
+    max-width: 300px; /* Sets a max-width to ensure videos are not too large */
+    height: 150px; /* Maintains aspect ratio */
+}
+
+
+/* Style for the individual video list */
+.video-list {
+    max-width: 100%;
+    height: 200px;
+    /* Adjust this height as needed */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin: 10px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    /* Enables vertical scrolling if content overflows */
+}
+
+#videoList video {
+    height: auto;
+    /* Adjust based on your layout needs, could be a specific height like 200px */
+    max-width: 40%;
+    margin: 10px;
+    /* Adds space around each video */
+}
+
+/* -------------  Scrollable Buttons style for settings  ----------------------------- */
+
+/* The switch - the box around the slider */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+/* Hide default checkbox */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* The slider */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+input:checked+.slider {
+    background-color: #2196F3;
+}
+
+input:focus+.slider {
+    box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked+.slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+
+
+/* ------------- Save and Cancel button -------------------*/
+.btn {
+    background-color: #4CAF50; /* Green background */
+    color: white; /* White text */
+    padding: 10px 20px; /* Padding inside the button */
+    border: none; /* No border */
+    cursor: pointer; /* Cursor changes to a pointer on hover */
+    font-size: 16px; /* Font size */
+    border-radius: 5px; /* Rounded corners */
+    height: 50px;
+    width: 150px;
+    transition: background-color 0.3s, box-shadow 0.2s; /* Smooth transition for hover and active states */
+    position: center;
+}
+
+.btn:hover {
+    background-color: #45a049; /* Darker shade on hover */
+}
+
+.btn:active {
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.2); /* Simulate button being pressed */
+}
+
+/* Specific styling for the Cancel button */
+.btn.cancel {
+    background-color: #f44336; /* Red background for cancel */
+}
+
+.btn.cancel:hover {
+    background-color: #d73833; /* Darker shade on hover for cancel */
+}
+
+
+
+form {
+    width: 600px;
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    margin-bottom: 5px;
+}
+
+input[type="text"] {
+    width: 220px;
+    padding: 8px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+input[type="number"] {
+    height: 39px;
+    margin-left: 10px;
+    margin-right: 10px;
+    width: 50px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 8px;
+}
+
+.score_number {
+    display: flex;
+}
+
+
+.for_score {
+    margin-left: 450px;
+}
+

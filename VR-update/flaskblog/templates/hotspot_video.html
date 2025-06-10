@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="static/styleshotspotvideo.css">
+    <title>Conversation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fontawesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+
+    <!-- ... (existing meta tags and stylesheets) ... -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+        integrity="sha512-w9SNJ2fE/GxwA3s56Hr5D9ZGGC6x5KGQ1r1C6kHtvDPzv68gRhDnxJo+JI9nrmy2O3tgZDnATBU5FGiUZ0MsUg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+</head>
+
+<body>
+    <header class="title-bar">
+        <span class="title">Hotspot Video</span>
+        <div class="buttons-container">
+            <a class="nav-item nav-link" href="{{ url_for('main.home') }}"><img class="icon"
+                    src="./static/icons/home.png" alt="Home icon"></a>
+            <img class="icon" src="./static/icons/save.png" alt="Home icon">
+            <img class="icon" src="./static/icons/settings.png" alt="Home icon">
+        </div>
+    </header>
+    <div class="container">
+        <h2>Give a name and choose a video from the media liabrary to add to hotspot to the video</h2>
+        <br>
+        <br>
+
+        <form action="{{ url_for('posts.hotspot') }}" method="POST">
+
+            <label for="name" style="width: 120px;">Hotspot Name:</label>
+            <input type="text" id="name" name="name_hot" value="{{name}}" required>
+            <input type="hidden" id="x" name="x_value" value="{{x}}">
+            <input type="hidden" id="y" name="y_value" value="{{y}}">
+            <input type="hidden" id="eid" name="exp_id" value="{{exp_id}}">
+            <input type="hidden" id="selectedVideoPath" name="selectedVideoPath" value="">
+            <br>
+            <label for="name" style="width: 120px;">video lists</label>
+
+            <br>
+            <div class="video-container">
+                <label for="Videolist" style="width: 120px;">video lists</label>
+                <div class="video-container">
+                    {% for video_file in video_files %}
+                    <video controls onclick="selectVideo(event)">
+                        <source
+                            src="{{ url_for('static', filename='Library/' + library_folder_name + '/' + experience_folder_name + '/temp_video/' + video_file) }}"
+                            type="video/mp4">
+                    </video>
+                    <br>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <br>
+            <div>
+                <label for="startTime">Start time:</label>
+                <input type="text" id="currentTime" name="currentTime" value="{{currentTime}}"><br>
+                <label>Scrubbing allowed:</label>
+                <button type="button" style="margin-left: 16.56%; background-color: red;" class="btn" id="toggleButton1"
+                    name='scrub1' onclick="toggle1()" value="0">Off</button>
+            </div>
+            <div><br>
+                <label for="">Going back to the main page allowed:</label>
+                <button type="button" class="btn" style="margin-left: 5.8%; background-color: red;" name='main_p'
+                    id="toggleButton" onclick="toggle()" value="0">Off</button>
+            </div>
+            <br><br>
+            <input type="hidden" name="video" value="{{video_files}}">
+            <input type="hidden" id="scrub1Value" name="scrub1" value="0">
+            <input type="hidden" id="main_pValue" name="main_p" value="0">
+            <div>
+                <center>
+                    <button type="button" class="btn" onclick="cancelForm()">Cancel</button>
+                    &nbsp;&nbsp;
+                    <button type="submit" class="btn"> Save </button>
+                </center>
+
+            </div>
+        </form>
+    </div>
+
+    </div>
+    <script>
+        function selectVideo(event) {
+            // Remove highlight from all videos
+            document.querySelectorAll('.video-container video').forEach(video => {
+                video.style.outline = 'none';
+            });
+
+            // Ensure the target of the event is a video element before applying the outline
+            if (event.target.tagName === 'VIDEO') {
+                // Highlight the selected video
+                event.target.style.outline = '2px solid blue';
+
+                // Set the selected video's path to the hidden input
+                var videoPath = event.target.querySelector('source').src;
+                
+                var videoName = videoPath.split('/').pop(); // This assumes the video file name is at the end of the URL
+                console.log("Selected video name: " + videoName); // Print the video name to the console
+                document.getElementById('selectedVideoPath').value = videoName;
+            }
+        }
+        function toggle() {
+            var button = document.getElementById("toggleButton");
+            if (button.innerHTML === "Off") {
+                button.innerHTML = "On";
+                button.style.backgroundColor = "green"; // Change button color when on
+                document.getElementById("main_pValue").value = 1;
+            } else {
+                button.innerHTML = "Off";
+                button.style.backgroundColor = "red"; // Change button color when off
+                document.getElementById("main_pValue").value = 0;
+            }
+        }
+        function toggle1() {
+            var button = document.getElementById("toggleButton1");
+            if (button.innerHTML === "Off") {
+                button.innerHTML = "On";
+                button.style.backgroundColor = "green"; // Change button color when on
+                document.getElementById("scrub1Value").value = 1;
+            }
+            else {
+                button.innerHTML = "Off";
+                button.style.backgroundColor = "red"; // Change button color when off
+                document.getElementById("scrub1Value").value = 0;
+            }
+        }
+
+    </script>
+</body>
+
+</html>
